@@ -71,7 +71,12 @@ str_number:
 
     xor rax,rax
     xor rcx,rcx
+    cmp byte [rsi], 45
+    jne .loop
+    mov r8, -1
+    inc rcx
 .loop:
+
     xor     rbx, rbx
     mov     bl, byte [rsi+rcx]
     cmp     bl, 48
@@ -86,6 +91,12 @@ str_number:
     inc     rcx
     jmp     .loop
 
+;если -
+.sign:
+  cmp r8, 0
+  jg .finished
+  neg rax
+
 .finished:
     cmp     rcx, 0
     je      .restore
@@ -96,3 +107,50 @@ str_number:
     pop rbx
     pop rcx
     ret
+
+
+print:
+mov [output], rax
+mov eax, 1
+mov edi, 1
+mov rsi, output
+mov edx, 1
+syscall
+ret
+
+; rax input
+
+print_num:
+xor rbx, rbx
+mov rcx, 10
+
+;если -
+cmp rax, 0
+ jg .loop
+ neg rax
+ push rax
+ mov al, '-'
+ call print
+ pop rax
+ ;inc rbx
+
+.loop:
+xor rdx, rdx
+div rcx
+push rdx
+inc rbx
+cmp rax, 0
+jne .loop
+
+.print_loop:
+pop rax
+add rax, '0'
+call print
+dec rbx
+cmp rbx, 0
+jne .print_loop
+
+mov al, 0xA
+call print
+ret
+
