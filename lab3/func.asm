@@ -128,10 +128,10 @@ mov rcx, 10
 cmp rax, 0
  jg .loop
  neg rax
- push rax
+ ;push rax
  mov al, '-'
  call print
- pop rax
+ ;pop rax
  ;inc rbx
 
 .loop:
