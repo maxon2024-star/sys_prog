@@ -33,11 +33,23 @@ _start:
   ;add rax, c
 
   mov rax,[a]
+  mov rbx, [c]
+  
+  test rbx, rbx
+  jns fl1
+  neg [c]
+  mov r8, 1
+
+  fl1:
   div [c]
+  cmp r8, 1
+  jne fl2
+  neg [c]
+  neg rax
+
+  fl2:
   sub rax, [a]
   sub rax, [b]
   sub rax, [c]
-
-
   call print_num
   call exit

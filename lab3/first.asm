@@ -2,7 +2,10 @@ format ELF64
 
 public _start
 
-include 'func.asm' 
+include 'func.asm'
+
+section '.bss' writable 
+  output dq 0
 
 section '.text' executable
   _start:

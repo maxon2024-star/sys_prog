@@ -65,18 +65,22 @@ len_str:
 ;Function converting the string to the number
 ;input rsi - place of memory of begin string
 ;output rax - the number from the string
+;Function converting the string to the number
+;input rsi - place of memory of begin string
+;output rax - the number from the string
 str_number:
     push rcx
     push rbx
 
     xor rax,rax
     xor rcx,rcx
-    cmp byte [rsi], 45
+    xor r8, r8
+    cmp byte [rsi], '-'
     jne .loop
-    mov r8, -1
     inc rcx
+    mov r8, 1
+    
 .loop:
-
     xor     rbx, rbx
     mov     bl, byte [rsi+rcx]
     cmp     bl, 48
@@ -91,12 +95,6 @@ str_number:
     inc     rcx
     jmp     .loop
 
-;если -
-.sign:
-  cmp r8, 0
-  jg .finished
-  neg rax
-
 .finished:
     cmp     rcx, 0
     je      .restore
@@ -106,16 +104,22 @@ str_number:
 .restore:
     pop rbx
     pop rcx
-    ret
-
+    cmp r8, 1
+    jne .fin
+    neg rax
+.fin:
+xor r8, r8
+ret
 
 print:
+push rcx
 mov [output], rax
 mov eax, 1
 mov edi, 1
 mov rsi, output
 mov edx, 1
 syscall
+pop rcx
 ret
 
 ; rax input
@@ -123,16 +127,13 @@ ret
 print_num:
 xor rbx, rbx
 mov rcx, 10
-
-;если -
-cmp rax, 0
- jg .loop
- neg rax
- ;push rax
- mov al, '-'
- call print
- ;pop rax
- ;inc rbx
+test rax, rax
+jns .loop
+push rax
+mov rax, '-'
+call print
+pop rax
+neg rax
 
 .loop:
 xor rdx, rdx
@@ -144,13 +145,11 @@ jne .loop
 
 .print_loop:
 pop rax
-add rax, '0'
+add rax, 48
 call print
 dec rbx
 cmp rbx, 0
 jne .print_loop
-
-mov al, 0xA
-call print
+call new_line
 ret
 
