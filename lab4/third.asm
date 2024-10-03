@@ -2,16 +2,22 @@ format ELF64
 public _start
 include '/workspaces/sys_prog/lab3/func.asm'
 section '.bss' writable 
-  output dq 0
-  ;sum dq 0
   n dq ?
+  output dq ?
 
 
 section '.text' executable 
  _start:
-    mov     rsi, [rsp + 16]      ; В rsi - указатель на argv    
-call str_number
-    mov [n], rax
+    mov rax, 0
+    mov rdi, 0
+    mov rsi, n
+    mov rdx, 255
+    syscall
+    mov rax, n
+    call len_str
+    mov byte [n + rax], 0
+    call str_number
+    xor r8, r8
 
 
     xor rsi,rsi
