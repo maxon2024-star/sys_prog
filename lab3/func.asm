@@ -153,3 +153,27 @@ jne .print_loop
 call new_line
 ret
 
+; inp - rsi
+input_keyboard:
+  push rax
+  push rdi
+  push rdx
+
+  mov rax, 0
+  mov rdi, 0
+  mov rdx, 255
+  syscall
+
+  xor rcx, rcx
+  .loop:
+     mov al, [rsi+rcx]
+     inc rcx
+     cmp rax, 0x0A
+     jne .loop
+  dec rcx
+  mov byte [rsi+rcx], 0
+  
+  pop rdx
+  pop rdi
+  pop rax
+  ret

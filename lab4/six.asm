@@ -6,7 +6,7 @@ include '/workspaces/sys_prog/lab3/func.asm'
 
 section '.bss' writable 
   output dq 0
-  input dq ?
+  input rb 255
   ;sum dq 0
   ;n dq ?
 
@@ -15,94 +15,65 @@ section '.text' executable
     mov rax, 0
     mov rdi, 0
     mov rsi, input
-    mov rdx, 255
-    syscall
-    mov rax, input
-    call len_str
-    mov byte [input + rax], 0
+    call input_keyboard
+    mov rsi, input
+    ;call len_str
+    ;mov byte [input + rax], 0
     call str_number
     xor r8, r8
 
-    ;mov rbx, rax ; число
-    mov rsi, rax ; счетчик
+    mov rbx, rax ; исх число
     xor rdi, rdi ; n чисел
-    mov rdi,0
+    cmp rax, 5
+    jl .end1
+    mov rsi, 5 ; счетчик
 
-  .su:
-     xor rax,rax
-     cmp rsi,9
-     jg .f1
     
-    inc rdi
-    mov rax, rdi
-    call print_num
-    call exit  
+  .su:
 
-     .f1:
-     mov rax,rsi     
      xor rcx, rcx
-     mov rcx,5     
-     div rcx
-     cmp rdx,0 
-     je .fl1
+     xor rdx,rdx
 
-     dec rsi
-     cmp rsi,0
-     jne .su
+     cmp rsi, rbx
+     jg .end1
 
      .fl1:
-     cmp rsi, 22
-     jl .fl3
-
      xor rax,rax
      mov rax,rsi     
      xor rcx, rcx
-     mov rcx,21     
+     xor rdx,rdx
+     mov rcx,7     
      div rcx
      cmp rdx,0 
      jg .fl2
 
-     dec rsi
-     cmp rsi,0
-     jne .su
+     add rsi, 5
+     cmp rsi, rbx
+     jg .end1
 
-     .fl2:
-     add rdi,1
-     dec rsi
-     cmp rsi,0
-     jne .su
+    .fl2:
+     xor rax,rax
+     mov rax,rsi     
+     xor rcx, rcx
+     xor rdx,rdx
+     mov rcx,3     
+     div rcx
+     cmp rdx,0 
+     jg .fl3
+
+     add rsi, 5
+     cmp rsi, rbx
+     jg .end1
+
 
      .fl3:
-     cmp rsi, 20
-     jl .fl4
-
-     add rdi,3
-     mov rax, rdi
-     call print_num
-     call exit 
-
-     .fl4:
-     cmp rsi, 10
-     jl .fl5
-
-     add rdi,2
-     mov rax, rdi
-     call print_num
-     call exit 
-
-     .fl5:
-     cmp rsi, 5
+     add rdi,1
+     add rsi,5
+     cmp rsi,rbx
      jl .su
 
-     add rdi,1
-     mov rax, rdi
-     call print_num
-     call exit
-     
-
-
-
-inc rdi
+    
+.end1:
 mov rax, rdi
 call print_num
 call exit  
