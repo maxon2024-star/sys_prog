@@ -1,10 +1,11 @@
 format ELF64
 public _start
-public asc_comp
+
 include 'func.asm'
 
 section '.bss' writable
   buf db 1
+  output dq ?
 
 _start:
   pop rcx
@@ -22,29 +23,184 @@ _start:
 
   mov rdi,[rsp+16]
   mov rax, 2
-  mov rsi, 577
-  mov rdx, 777o
+  mov rsi, 1101o
   syscall
   cmp rax, 0
   jl .l1
 
   mov r9, rax
 
-  mov r10, rax ; длина файла
-
-  xor rbx, rbx
+  xor rbx, rbx ; счетчик
+;./a.out ot_input.txt ot_output.txt
 
 ;тут пытаемся нормально записать буфер
 .loop: 
+cmp rax, 0
+je .next
+
+push rcx
+mov rax, 0
+mov rdi, r8
 mov rsi, buf
-call asc_comp
+mov rdx, 1
+syscall
+pop rcx
 
-  mov rax, 0
-  mov rdi, r8
+cmp byte [buf], 'B'
+je .sogl
+
+cmp byte [buf], 'b'
+je .sogl
+
+cmp byte [buf], 'C'
+je .sogl
+
+cmp byte [buf], 'c'
+je .sogl
+
+cmp byte [buf], 'D'
+je .sogl
+
+cmp byte [buf], 'd'
+je .sogl
+
+cmp byte [buf], 'F'
+je .sogl
+
+cmp byte [buf], 'f'
+je .sogl
+
+cmp byte [buf], 'G'
+je .sogl
+
+cmp byte [buf], 'g'
+je .sogl
+
+cmp byte [buf], 'H'
+je .sogl
+
+cmp byte [buf], 'h'
+je .sogl
+
+cmp byte [buf], 'J'
+je .sogl
+
+cmp byte [buf], 'j'
+je .sogl
+
+cmp byte [buf], 'K'
+je .sogl
+
+cmp byte [buf], 'k'
+je .sogl
+
+cmp byte [buf], 'L'
+je .sogl
+
+cmp byte [buf], 'l'
+je .sogl
+
+cmp byte [buf], 'M'
+je .sogl
+
+cmp byte [buf], 'm'
+je .sogl
+
+cmp byte [buf], 'N'
+je .sogl
+
+cmp byte [buf], 'n'
+je .sogl
+
+cmp byte [buf], 'P'
+je .sogl
+
+cmp byte [buf], 'p'
+je .sogl
+
+cmp byte [buf], 'Q'
+je .sogl
+
+cmp byte [buf], 'q'
+je .sogl
+
+cmp byte [buf], 'R'
+je .sogl
+
+cmp byte [buf], 'r'
+je .sogl
+
+cmp byte [buf], 's'
+je .sogl
+
+cmp byte [buf], 'S'
+je .sogl
+
+cmp byte [buf], 'T'
+je .sogl
+
+cmp byte [buf], 't'
+je .sogl
+
+cmp byte [buf], 'V'
+je .sogl
+
+cmp byte [buf], 'v'
+je .sogl
+
+cmp byte [buf], 'W'
+je .sogl
+
+cmp byte [buf], 'w'
+je .sogl
+
+cmp byte [buf], 'X'
+je .sogl
+
+cmp byte [buf], 'x'
+je .sogl
+
+cmp byte [buf], 'Y'
+je .sogl
+
+cmp byte [buf], 'y'
+je .sogl
+
+cmp byte [buf], 'Z'
+je .sogl
+
+cmp byte [buf], 'z'
+je .sogl
+
+jmp .gl
+
+.sogl:
+mov rsi, buf
+mov rdx, rax
+mov rax, 1
+mov rdi, r9
+syscall
+jmp .gl
+
+.gl:
+  inc rbx
   mov rsi, buf
-  mov rdx, 1
+  mov rdx, rax
+  mov rax, 1
+  mov rdi, r9
   syscall
+  jmp .loop
 
+.next:
+mov rax, buf
+call len_str
+cmp rax, 0
+je .l2
+mov rsi, buf
+mov rdx, rax
+mov rax, 1
+mov rdi, r9
+syscall
 
 .l2:
   mov rdi, r8
@@ -55,90 +211,7 @@ call asc_comp
   mov rax, 3
   syscall
 
-.l1:
   call exit
 
-
-asc_comp:
-mov byte rax, rsi
-cmp rax,65
-jne .a
-
-; out
-  ret
-
-
-.a:
-cmp rax,97
-jne .E
-
-; out
-  ret
-
-
-.E:
-cmp rax,69
-jne .e
-
-; out
-  ret
-
-
-.e:
-cmp rax,101
-jne .I
-
-; out
-  ret
-
-
-.I:
-cmp rax,73
-jne .i
-
-; out
-  ret
-
-
-.i:
-cmp rax,105
-jne .O
-
-; out
-  ret
-
-
-.O:
-cmp rax,79
-jne .o
-
-; out
-  ret
-
-
-.o:
-cmp rax,111
-jne .U
-
-; out
-  ret
-
-
-.U:
-cmp rax,85
-jne .u
-
-; out
-  ret
-
-
-.a:
-cmp rax, 117
-jne .not_gl
-
-; out
-  ret
-
-
-.not_gl:
-  ret
+.l1:
+  call exit
