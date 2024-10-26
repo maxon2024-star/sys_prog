@@ -1,0 +1,5 @@
+List.txt
+MyArch.tar.gz
+Task_1.txt
+Task_2.txt
+Task_3.txt
