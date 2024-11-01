@@ -6,13 +6,13 @@ unsigned long * free_memory();
 
 void add_end(unsigned n,unsigned num );
 
-long del_beg(unsigned n);
+void del_beg(unsigned n);
 
-void fill_rnum(long size);
+void fill_rnum(long n);
 
-long count_prime();
+long count_prime(long n);
 
-long count_end_1();
+long count_end_1(long n);
 
 
 int main(){
@@ -30,22 +30,24 @@ int main(){
     } 
 
     for (int i = 0; i < n; i++){
-        printf("%ld\n", myarr[i]);
+        printf("%ld ", myarr[i]);
     }
+    printf("\n");
+    
+    long end_with_1 = count_end_1(n);
+    printf("оканчиваются на 1: %ld\n", end_with_1);
 
+    long prime = count_prime(n);
+    printf("простых: %ld\n", prime);
+    return 0;
     for (int i = 0; i < n; i++){
        del_beg(n);
+    for (int i = 0; i < n; i++){
+        printf("%ld ", myarr[i]);
+    }
+    printf("\n");
        n--;
     }
-    return 0;
-    long end_with_1 = count_end_1();
-    return 0;
-    long prime = count_prime();
-    return 0;
-
-    printf("простых: %ld, оканчиваются на 1: %ld\n", prime, end_with_1);
-    
-
 
     free_memory(myarr);
     return 0;    

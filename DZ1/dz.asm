@@ -83,12 +83,13 @@ fill_rnum:
 
 
 count_prime:
-xor rcx, rcx
+    xor rcx, rcx
     mov rsi, [array_begin]
     mov r8,[count]
+    imul r8, 8
     
     .loop:
-        cmp rsi, [array_begin + r8*8]
+        cmp rsi, [array_begin + r8]
         je .end
 
         mov rax, [rsi]
@@ -137,41 +138,48 @@ add_end:
     ret
 
 del_beg:
-    xor rbx, rbx
-    imul rdi,8
-	mov rbx, [array_begin]
-	add rbx, rdi
-	mov rax, 12
-	syscall
+xor rbx, rbx
+    mov rax, rdi
+    imul rax,8
+    add [array_begin], 8
+	dec [count]
+    ;leave
+    ret
+
+    xor rax, rax
+    cmp [count], 0
+    je @f
+    cmp [array_begin], 0
+    je @f
+    mov rsi, [array_begin]
+    mov rax, [rsi]
+    add [array_begin], 8
+    dec [count]
+    
+    @@:
     ret
 
 ; считает количество чисел в очереди, которые оканчиваются на 1
 count_end_1:
     xor rcx, rcx
-    mov rsi, [array_begin]
-    
+    mov rsi, 0
+    imul rdi, 8 
+
     .loop:
-        cmp rsi, [count]
-        je .end
+        cmp rsi, rdi
+        jge .end
 
         xor rdx, rdx
-        mov rax, [rsi]
+        mov rax, [array_begin+rsi]
         mov rbx, 10
         div rbx
 
         cmp rdx, 1
-        jne @f
+        jne .f
         inc rcx
 
-        @@:
+        .f:
         add rsi, 8
-        mov rbx, [count]
-        imul rbx, 8
-        cmp rsi, rbx
-        jne @f
-        mov rsi, [array_begin]
-
-        @@:
         jmp .loop
 
     .end:
