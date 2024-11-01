@@ -84,21 +84,23 @@ fill_rnum:
 
 count_prime:
     xor rcx, rcx
-    mov rsi, [array_begin]
-    mov r8,[count]
-    imul r8, 8
+    mov rsi, 0
+    imul rdi, 8
     
     .loop:
-        cmp rsi, [array_begin + r8]
+        cmp rsi, rdi
         je .end
-
-        mov rax, [rsi]
+        mov rax, [array_begin+rsi]
+        push rsi
         call count_prime_check ; если в rax не простое число, то в rdx будет 0
+        pop rsi
         cmp rdx, 0
+        je .f
         inc rcx
 
-        add rsi, 8
-        jmp .loop
+        .f: 
+          add rsi, 8
+          jmp .loop
     .end:
     mov rax, rcx
     ret
@@ -138,23 +140,24 @@ add_end:
     ret
 
 del_beg:
-xor rbx, rbx
-    mov rax, rdi
-    imul rax,8
-    add [array_begin], 8
-	dec [count]
+;xor rbx, rbx
+ ;  mov rax, rdi
+  ; imul rax,8
+    ;add [array_begin], 8
+	;dec [count]
     ;leave
-    ret
+    ;ret
 
     xor rax, rax
-    cmp [count], 0
+    cmp rdi, 0
     je @f
     cmp [array_begin], 0
     je @f
     mov rsi, [array_begin]
-    mov rax, [rsi]
-    add [array_begin], 8
-    dec [count]
+    mov rax, 0
+    add rsi, 8
+    mov [array_begin], rsi
+    dec rdi
     
     @@:
     ret

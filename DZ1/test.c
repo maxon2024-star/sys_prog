@@ -33,19 +33,16 @@ int main(){
         printf("%ld ", myarr[i]);
     }
     printf("\n");
-    
+
     long end_with_1 = count_end_1(n);
     printf("оканчиваются на 1: %ld\n", end_with_1);
 
     long prime = count_prime(n);
     printf("простых: %ld\n", prime);
-    return 0;
+
+
     for (int i = 0; i < n; i++){
        del_beg(n);
-    for (int i = 0; i < n; i++){
-        printf("%ld ", myarr[i]);
-    }
-    printf("\n");
        n--;
     }
 
