@@ -6,3 +6,6 @@ c: asm test.c
 
 run: c prog
 		./prog
+
+clean:
+        rm -f *.o
