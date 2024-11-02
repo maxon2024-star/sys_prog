@@ -3,15 +3,17 @@ format elf64
 
 	public create_array
 	public free_memory
+
     public gen_random
     public fill_rnum
 
     public count_prime
     public count_prime_check
+
     public count_end_1
 
-    public add_end
-    public del_beg
+    public sum
+    public reverse
 
     f  db "/dev/urandom",0
 
@@ -20,18 +22,19 @@ format elf64
 	section '.bss' writable
         number rq 1
         array_begin rq 1
+        array_begin_adress rq 1
         count rq 1
 
 
 
-;rdi - n of mas
+
+; Функция создания массива
 create_array:
 	mov [count], rdi
 	;; Получаем начальное значение адреса кучи
 	xor rdi,rdi
 	mov rax, 12
 	syscall
-
 	mov [array_begin], rax
 	mov rdi, [array_begin]
 	add rdi, [count]
@@ -40,11 +43,13 @@ create_array:
 	mov rax, array_begin
 	ret
 
+
+; Функция освобождения памяти
 free_memory:
-	xor rdi,[array_begin]
-	mov rax, 12
-	syscall
-	ret
+    xor rdi, rdi               ; Начинаем с нулевого адреса
+    mov rax, 12                ; Системный вызов brk
+    syscall                    ; Устанавливаем кучу на исходную позицию
+    ret                        ; Завершение функции
 
 gen_random:
     mov rdi, f
@@ -134,34 +139,6 @@ count_prime_check:
     .end:
     ret
 
-add_end:
-    imul rdi, 8
-    mov [array_begin+rdi], rsi
-    ret
-
-del_beg:
-;xor rbx, rbx
- ;  mov rax, rdi
-  ; imul rax,8
-    ;add [array_begin], 8
-	;dec [count]
-    ;leave
-    ;ret
-
-    xor rax, rax
-    cmp rdi, 0
-    je @f
-    cmp [array_begin], 0
-    je @f
-    mov rsi, [array_begin]
-    mov rax, 0
-    add rsi, 8
-    mov [array_begin], rsi
-    dec rdi
-    
-    @@:
-    ret
-
 ; считает количество чисел в очереди, которые оканчиваются на 1
 count_end_1:
     xor rcx, rcx
@@ -188,3 +165,26 @@ count_end_1:
     .end:
     mov rax, rcx
     ret
+
+sum:
+     xor rcx, rcx
+    mov rsi, 0
+    imul rdi, 8 
+
+    .loop:
+        cmp rsi, rdi
+        jge .end
+
+        xor rdx, rdx
+        mov rax, [array_begin+rsi]
+        add rcx, rax
+
+        .f:
+        add rsi, 8
+        jmp .loop
+
+    .end:
+    mov rax, rcx
+    ret
+
+reverse:
