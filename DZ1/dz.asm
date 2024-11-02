@@ -175,16 +175,44 @@ sum:
         cmp rsi, rdi
         jge .end
 
-        xor rdx, rdx
         mov rax, [array_begin+rsi]
         add rcx, rax
 
-        .f:
         add rsi, 8
         jmp .loop
-
+        
     .end:
     mov rax, rcx
     ret
 
 reverse:
+    xor rcx, rcx
+    mov rsi, 0
+    mov rax, rdi
+    mov rbx, 2
+    div rbx
+    mov r9, rax
+    dec rdi
+
+    imul rdi, 8
+    imul r9, 8 
+
+    .loop:
+        cmp rsi, r9
+        jge .end
+        ;cmp rsi, 
+        sub rdi, rsi
+
+        xor r11, r11
+        xor rax, rax
+        mov rax, [array_begin+rsi]
+        mov r11, [array_begin+rdi]
+
+        mov [array_begin+rsi], r11
+        mov [array_begin+rdi], rax
+        
+        add rsi, 8
+        jmp .loop
+
+    .end:
+      ret

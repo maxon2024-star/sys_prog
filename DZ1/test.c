@@ -6,6 +6,8 @@ long * free_memory();
 
 long sum(long n);
 
+void reverse(long n);
+
 void fill_rnum(long n);
 
 long count_prime(long n);
@@ -14,7 +16,7 @@ long count_end_1(long n);
 
 
 int main(){
-    long *myarr, *myrevarr, n;
+    long *myarr, n;
     scanf("%ld",&n);
     myarr = create_array(n);
     //fill_array(n);
@@ -34,8 +36,12 @@ int main(){
     long s = sum(n);
     printf("сумма: %ld\n", s);
 
-    myrevarr = create_array(n);
+    reverse(n);
+    printf("Обратный массив:\n");
+    for (int i = 0; i < n; i++){
+        printf("%ld ", myarr[i]);
+    }
+    printf("\n");
     free_memory();
-
     return 0;    
 }
