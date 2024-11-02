@@ -8,4 +8,4 @@ run: c prog
 		./prog
 
 clean:
-        rm -f *.o
+		rm -f *.o
