@@ -33,4 +33,5 @@ section '.text' executable
         dec cl
         cmp cl, 0
         jne .iter2
+    call new_line
     call exit
