@@ -30,7 +30,7 @@ section '.bss' writable
     delay dq ?
 
 section '.text' executable
-
+    extern  COLOR_BLACK, COLOR_GREEN, COLOR_WHITE
 _start:
     call initscr
 	mov rdi, [stdscr]
