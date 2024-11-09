@@ -23,21 +23,24 @@ extrn printw
 
 section '.bss' writable
     xmax dq 1
-	ymax dq 1
+    ymax dq 1
     xmid dq 1
     ymid dq 1
-	palette dq 1
-    delay dq ?
+    palette dq 1
+    delay dq 500000
+    l_shag dq 1 ;длина шага
+    n_shag dq 1 ;количество
+    m_direct dq 0 ;направление
 
 section '.text' executable
-    extern  COLOR_BLACK, COLOR_GREEN, COLOR_WHITE
+
 _start:
     call initscr
-	mov rdi, [stdscr]
+    mov rdi, [stdscr]
     ;максимальные значения координат окна
-	call getmaxx
+    call getmaxx
     dec rax
-	mov [xmax], rax
+    mov [xmax], rax
     ;середина монитора
     xor rdx, rdx
     xor rcx, rcx
@@ -45,9 +48,9 @@ _start:
     div rcx
     mov [xmid],rax
 
-	call getmaxy
+  call getmaxy
     dec rax
-	mov [ymax], rax
+  mov [ymax], rax
     ;середина монитора
     xor rdx, rdx
     xor rcx, rcx
@@ -56,38 +59,40 @@ _start:
     mov [ymid],rax
 
     call start_color
-    ; COLOR_BLUE
+    ; COLOR_GREEN
     mov rdi, 1
-    mov rsi, f
-    mov rdx, f
-    call init_pair
-
-    ; COLOR_MAGENTA
-    mov rdi, 2
     mov rsi, 2
     mov rdx, 2
     call init_pair
 
+    ; COLOR_WHITE
+    mov rdi, 2
+    mov rsi, 0xf
+    mov rdx, 0xf
+    call init_pair
+
     call refresh
-	call noecho
-	call raw
+  call noecho
+  call raw
 
     mov rax, ' '
     or rax, 0x200
     mov [palette], rax
 
-    .begin:
+ .begin:
+    ; Движение по квадратной спирали
+    ; Переключение цвета
     mov rax, [palette]
     and rax, 0x100
     cmp rax, 0
-    jne .mag
+    jne .white
 
     mov rax, [palette]
     and rax, 0xff
     or rax, 0x100
     jmp @f
 
-    .mag:
+    .white:
     mov rax, [palette]
     and rax, 0xff
     or rax, 0x200
@@ -95,96 +100,170 @@ _start:
     @@:
     mov [palette], rax
 
-    mov r8, [xmax]
-    xor r9, r9
-    jmp .loop_to_left
+    ; Начало спирали из центра
+    mov r8, [xmid]  ; Начальная x-позиция
+    mov r9, [ymid]  ; Начальная y-позиция
 
-    .to_left:
-    inc r9
-    cmp r9, [ymax]
-    jg .begin
-    mov r8, [xmax]
+    mov [l_shag], 1      ; Длина текущего шага
+    mov [m_direct], 0      ; Направление (0: вправо, 1: вниз, 2: влево, 3: вверх)
+    mov [n_shag], 0      ; Счётчик шагов до изменения длины
 
-    .loop_to_left:
-        mov rdi, [delay]
-        call usleep
-        mov rdi, r9
-        mov rsi, r8
-        push r8
-        push r9
-        call move
-        mov rdi, [palette]
-        call addch
-        call refresh
+    ; Установка позиции
+    mov rdi, [ymid]    ; y-позиция
+    mov rsi, [xmid]    ; x-позиция
+    call move
 
-        mov rdi, 1
-        call timeout
-        call getch
-        cmp rax, 'z'
-        jne @f
-        jmp .exit
+    ; Отрисовка символа
+    mov rdi, [palette]
+    call addch
+    call refresh
 
-        @@:
-        cmp rax, 'h'
-        jne @f
-        cmp [delay], 2000
-        je .fast1
-        mov [delay], 2000
-        jmp @f
-        .fast1:
-        mov [delay], 100
+    ; Пауза
+    mov rdi, [delay]
+    call usleep
+.loop_spiral:
+    inc [l_shag]
+   ; mov [n_shag], 0      ; Счётчик шагов до изменения длины
+.direction_loop:
+    ; Проверка нажатия клавиши для выхода или изменения скорости
+    mov rdi, 1
+    call timeout
+    call getch
 
-        @@:
-        pop r9
-        pop r8
-        dec r8
-        cmp r8, 0
-        jl .to_right
-        jmp .loop_to_left
+    cmp al, 'z'
+    je .exit_program
 
-    .to_right:
-    inc r9
-    cmp r9, [ymax]
-    jg .begin
-    mov r8, 0
+    cmp al, 'h'
+    jne .no_speed_change
 
-    .loop_to_right:
-        mov rdi, [delay]
-        call usleep
-        mov rdi, r9
-        mov rsi, r8
-        push r8
-        push r9
-        call move
-        mov rdi, [palette]
-        call addch
-        call refresh
+    ; Изменение скорости
+    cmp [delay], 2000
+    je .fast
+    mov [delay], 2000
+    jmp .no_speed_change
 
-        mov rdi, 1
-        call timeout
-        call getch
-        cmp rax, 'z'
-        jne @f
-        jmp .exit
+.fast:
+    mov [delay], 100
 
-        @@:
-        cmp rax, 'h'
-        jne @f
-        cmp [delay], 2000
-        je .fast2
-        mov [delay], 2000
-        jmp @f
-        .fast2:
-        mov [delay], 100
-        
-        @@:
-        pop r9
-        pop r8
-        inc r8
-        cmp r8, [xmax]
-        jg .to_left
-        jmp .loop_to_right
+.no_speed_change:
+    ; Обновление позиции в зависимости от направления
+    xor rdx, rdx
+    mov rdx, [m_direct]
+    cmp rdx, 0
+    je .move_right
+    cmp rdx, 1
+    je .move_down
+    cmp rdx, 2
+    je .move_left
+    cmp rdx, 3
+    je .move_up
 
-    .exit:
+.move_right:
+    inc [xmid]
+    ; Установка позиции
+    mov rdi, [ymid]    ; y-позиция
+    mov rsi, [xmid]    ; x-позиция
+    call move
+
+    ; Отрисовка символа
+    mov rdi, [palette]
+    call addch
+    call refresh
+
+    ; Пауза
+    mov rdi, [delay]
+    call usleep
+    inc [m_direct]
+    inc [n_shag]
+    jmp .direction_continue
+
+.move_down:
+    inc [ymid]
+
+    ; Установка позиции
+    mov rdi, [ymid]    ; y-позиция
+    mov rsi, [xmid]    ; x-позиция
+    call move
+
+    ; Отрисовка символа
+    mov rdi, [palette]
+    call addch
+    call refresh
+
+    ; Пауза
+    mov rdi, [delay]
+    call usleep
+    inc [m_direct]
+    inc [n_shag]
+    jmp .direction_continue
+
+.move_left:
+    dec [xmid]
+    ; Установка позиции
+    mov rdi, [ymid]    ; y-позиция
+    mov rsi, [xmid]    ; x-позиция
+    call move
+
+    ; Отрисовка символа
+    mov rdi, [palette]
+    call addch
+    call refresh
+
+    ; Пауза
+    mov rdi, [delay]
+    call usleep
+
+    inc [m_direct]
+    inc [n_shag]
+    jmp .direction_continue
+
+.move_up:
+    dec [ymid]
+    ; Установка позиции
+    mov rdi, [ymid]    ; y-позиция
+    mov rsi, [xmid]    ; x-позиция
+    call move
+
+    ; Отрисовка символа
+    mov rdi, [palette]
+    call addch
+    call refresh
+
+    ; Пауза
+    mov rdi, [delay]
+    call usleep
+    inc [m_direct]
+    inc [n_shag]
+    jmp .direction_continue
+
+.direction_continue:
+    ; Смена направления и увеличение длины шага каждые два поворота    
+    cmp [n_shag], 3
+    jne .loop_spiral
+    inc [l_shag]
+    mov [n_shag], 0
+
+    cmp [m_direct], 4
+    jl .loop_spiral
+    mov [m_direct], 0
+
+    ; Проверка выхода за границы экрана и перезапуск спирали
+    mov rcx, [xmax]
+    cmp [xmid], 0
+    jl .begin
+
+    cmp [xmid], rcx
+    jge .begin
+
+    cmp [ymid], 0
+    jl .begin
+
+    mov rcx, [ymax]
+    cmp [ymid], rcx
+    jge .begin
+
+    jmp .loop_spiral
+
+.exit_program:
     call endwin
     call exit

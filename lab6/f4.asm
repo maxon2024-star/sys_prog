@@ -23,21 +23,21 @@ extrn printw
 
 section '.bss' writable
     xmax dq 1
-	ymax dq 1
+  ymax dq 1
     xmid dq 1
     ymid dq 1
-	palette dq 1
+  palette dq 1
     delay dq ?
 
 section '.text' executable
 
 _start:
     call initscr
-	mov rdi, [stdscr]
+  mov rdi, [stdscr]
     ;максимальные значения координат окна
-	call getmaxx
+  call getmaxx
     dec rax
-	mov [xmax], rax
+  mov [xmax], rax
     ;середина монитора
     xor rdx, rdx
     xor rcx, rcx
@@ -45,9 +45,9 @@ _start:
     div rcx
     mov [xmid],rax
 
-	call getmaxy
+  call getmaxy
     dec rax
-	mov [ymax], rax
+  mov [ymax], rax
     ;середина монитора
     xor rdx, rdx
     xor rcx, rcx
@@ -56,27 +56,27 @@ _start:
     mov [ymid],rax
 
     call start_color
-    ; COLOR_BLUE
+    ; COLOR_GREEN
     mov rdi, 1
-    mov rsi, f
-    mov rdx, f
-    call init_pair
-
-    ; COLOR_MAGENTA
-    mov rdi, 2
     mov rsi, 2
     mov rdx, 2
     call init_pair
 
+    ; COLOR_WHITE
+    mov rdi, 2
+    mov rsi, 0xf
+    mov rdx, 0xf
+    call init_pair
+
     call refresh
-	call noecho
-	call raw
+  call noecho
+  call raw
 
     mov rax, ' '
     or rax, 0x200
     mov [palette], rax
 
-    .begin:
+.begin:
     mov rax, [palette]
     and rax, 0x100
     cmp rax, 0
