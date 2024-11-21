@@ -1,8 +1,8 @@
-;Function exit
+;Function exit 
 exit:
-     mov rax, 60
-     mov rdi, 0
-     syscall
+    mov rax,1
+    mov rbx,0
+    int 0x80
 
 ;Function printing of string
 ;input rsi - place of memory of begin string
@@ -17,7 +17,7 @@ print_str:
     mov rax, 1
     mov rdi, 1
     syscall
-    pop rcx
+    pop rcx  
     pop rdx
     pop rdi
     pop rax
@@ -61,8 +61,10 @@ len_str:
      sub rax, rdx
      pop rdx
      ret
-
-
+     
+;Function converting the string to the number
+;input rsi - place of memory of begin string
+;output rax - the number from the string
 ;Function converting the string to the number
 ;input rsi - place of memory of begin string
 ;output rax - the number from the string
@@ -72,6 +74,12 @@ str_number:
 
     xor rax,rax
     xor rcx,rcx
+    xor r8, r8
+    cmp byte [rsi], '-'
+    jne .loop
+    inc rcx
+    mov r8, 1
+    
 .loop:
     xor     rbx, rbx
     mov     bl, byte [rsi+rcx]
@@ -96,42 +104,56 @@ str_number:
 .restore:
     pop rbx
     pop rcx
-    ret
+    cmp r8, 1
+    jne .fin
+    neg rax
+.fin:
+xor r8, r8
+ret
 
-;The function converts the nubmer to string
-;input rax - number
-;rsi -address of begin of string
-number_str:
-  push rbx
-  push rcx
-  push rdx
-  xor rcx, rcx
-  mov rbx, 10
-  .loop_1:
-    xor rdx, rdx
-    div rbx
-    add rdx, 48
-    push rdx
-    inc rcx
-    cmp rax, 0
-    jne .loop_1
-  xor rdx, rdx
-  .loop_2:
-    pop rax
-    mov byte [rsi+rdx], al
-    inc rdx
-    dec rcx
-    cmp rcx, 0
-  jne .loop_2
-  mov byte [rsi+rdx], 0   
-  pop rdx
-  pop rcx
-  pop rbx
-  ret
+print:
+push rcx
+mov [output], rax
+mov eax, 1
+mov edi, 1
+mov rsi, output
+mov edx, 1
+syscall
+pop rcx
+ret
 
+; rax input
 
-;The function realizates user input from the keyboard
-;input: rsi - place of memory saved input string 
+print_num:
+xor rbx, rbx
+mov rcx, 10
+test rax, rax
+jns .loop
+push rax
+mov rax, '-'
+call print
+pop rax
+neg rax
+
+.loop:
+xor rdx, rdx
+div rcx
+push rdx
+inc rbx
+cmp rax, 0
+jne .loop
+
+.print_loop:
+pop rax
+add rax, 48
+call print
+dec rbx
+cmp rbx, 0
+jne .print_loop
+call new_line
+ret
+
+; inp - rsi
 input_keyboard:
   push rax
   push rdi

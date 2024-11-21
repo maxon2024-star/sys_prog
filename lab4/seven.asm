@@ -2,56 +2,45 @@ format ELF64
 
 public _start
 
-include '/workspaces/sys_prog/lab3/func.asm'
+include 'func.asm'
 
 section '.bss' writable 
   output dq 0
+  input dq 0
   string rb 255
   s db ?
 
 
 section '.text' executable
   _start:
-  mov rax, 0
+    mov rax, 0
     mov rdi, 0
-    mov rsi, string
+    mov rsi, input
     call input_keyboard
-    mov rax, string
-    call len_str
-    mov rbx, rax
+    mov rsi, input
 
-     mov rcx, rax
-    dec rcx
-    mov al, [string]
-    mov byte [s], al
+    call str_number
+    xor r8, r8
 
-
-     ;inc rcx
-    .iter:
-        push rcx
-        push rax
-        mov al, [string+rcx]
-        call print_symb
-        pop rax
-        pop rcx
-        dec rcx
-        cmp rcx, 0
-        jne .iter ; выход как только 0
-
-    mov al, [s]
-    ;dec rcx    
-    ;mov al, [string]
-    ;call print_str
-    ;mov al, bl
-    call print_symb
-    call exit
+    ;rax- number
+    xor r11, r11 ; rev_number
+    xor r9, r9 ; digits
     
+    .su:  
+        
+     xor rdx, rdx
+     ; делим rax на rcx остаток в rdx       
+    xor rcx, rcx
+    mov rcx,10     
+    div rcx
 
-print_symb:
-  mov [string], al
-  mov rax, 4
-  mov rbx, 1
-  mov rcx, string
-  mov rdx, 1
-  int 0x80
-  ret
+    imul r11, 10
+    add r11, rdx
+
+    cmp rax, 0
+    jg .su
+
+  xor rax, rax
+  mov rax, r11
+  call print_num
+  call exit

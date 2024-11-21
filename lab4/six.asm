@@ -2,7 +2,7 @@ format ELF64
 
 public _start
 
-include '/workspaces/sys_prog/lab3/func.asm'
+include 'func.asm'
 
 section '.bss' writable 
   output dq 0
