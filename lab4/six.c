@@ -12,6 +12,6 @@ if ((n % 7 && n % 3) !=0  && n % 5 == 0){
     //printf("%d\n", n);
 }
 }
-printf("%d", sum);
+printf("%d\n", sum);
 return 0;
 }

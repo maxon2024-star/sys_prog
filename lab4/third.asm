@@ -25,7 +25,12 @@ section '.text' executable
     mov rsi, rax    ; schetchik    
     xor rbx, rbx   ; promez res    
     xor rdx, rdx   ; peremennaya
-    .su:     
+    .su:  
+
+    ; ДОБАВИЛ 0   
+    cmp rsi, 0
+    je .f1
+
     xor rdx, rdx
      xor rbx, rbx
      mov rdx, rsi
@@ -61,7 +66,7 @@ section '.text' executable
      cmp rsi, 0     
   jne .su
 
-;mov rax, [sum]
-mov rax, rdi
-call print_num
-call exit
+.f1:
+  mov rax, rdi
+  call print_num
+  call exit

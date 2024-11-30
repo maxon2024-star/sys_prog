@@ -11,6 +11,6 @@ while(n>0)
     rev=rev*10+rem; //multiply the current number by 10 and add this remainder.
     n=n/10; //divide the number. So it becomes 1234.
 }
-printf("%d",rev);
+printf("%d\n",rev);
 return 0;
 }

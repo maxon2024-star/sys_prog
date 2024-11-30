@@ -42,7 +42,7 @@ _start:
 
   xor rbx, rbx
 
-  ./a.out ot_input.txt ot_output.txt
+ ; ./a.out ot_input.txt ot_output.txt
 .loop:
   cmp r10, 0
   jl .l2
